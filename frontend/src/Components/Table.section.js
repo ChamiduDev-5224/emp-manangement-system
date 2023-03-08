@@ -1,21 +1,109 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Modal, Form, Button } from "react-bootstrap";
 
 function Tablesection(props) {
   const [data, setData] = useState([]);
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  //form states
+  const [idState, setIdState] = useState({});
+  const [fnameState, setFNameState] = useState({});
+  const [iName, setIName] = useState({});
+  const [disName, setDisName] = useState({});
+  const [gender, setGender] = useState({});
+  const [dob, setDob] = useState({});
+  const [email, setEmail] = useState({});
+  const [mobile, setMobile] = useState({});
+  const [empType, setEmpType] = useState({});
+  const [joindate, setJoinDate] = useState({});
+  const [designation, setDesignation] = useState({});
+  const [experience, setExperience] = useState({});
+  const [salary, setSalary] = useState({});
+  const [pNote, setPNote] = useState({});
   useEffect(() => {
     fetchData();
   }, []);
+
+  //fetch data to table
   const fetchData = () => {
     axios.get("http://localhost:5000/api/emp/getAlldata").then((res) => {
       const data = res.data.data;
       setData(data);
-      console.log(data);
     });
   };
-  const editData = () => {};
+  //edit data
+  const editData = (
+    id,
+    fullname,
+    initialname,
+    displayname,
+    gender,
+    dob,
+    email,
+    mobile,
+    designation,
+    emptype,
+    joindate,
+    experience,
+    salary,
+    personalnote
+  ) => {
+    handleShow();
+    setIdState(id);
+    setFNameState(fullname);
+    setIName(initialname);
+    setDisName(displayname);
+    setGender(gender);
+    setDob(dob);
+    setEmail(email);
+    setMobile(mobile);
+    setDesignation(designation);
+    setEmpType(emptype);
+    setJoinDate(joindate);
+    setExperience(experience);
+    setSalary(salary);
+    setPNote(personalnote);
+  };
+
+  //update data
+  const updateData = () => {
+    axios
+      .patch(
+        `http://localhost:5000/api/emp/updateEmp/${idState}`,
+        {
+          fname: fnameState,
+          ininame: iName,
+          disname: disName,
+          gender: gender,
+          dob: dob,
+          email: email,
+          mobile: mobile,
+          designation: designation,
+          emptype: empType,
+          joindt: joindate,
+          expr: experience,
+          salary: salary,
+          pnote: pNote,
+          id: idState,
+        },
+
+        {
+          headers: { "Content-type": "application/json" },
+        }
+      )
+      .then((res) => {
+        handleClose();
+        fetchData();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  //delete data
   const deleteData = (id) => {
-    console.log("hello");
     axios
       .delete("http://localhost:5000/api/emp/deleteEmp/" + id)
       .then((response) => {
@@ -102,10 +190,20 @@ function Tablesection(props) {
                         className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                         onClick={() => {
                           editData(
-                            items.catId,
-                            items.catName,
-                            items.create_at,
-                            items.updated_at
+                            items.id,
+                            items.fullname,
+                            items.initialname,
+                            items.displayname,
+                            items.gender,
+                            items.dob,
+                            items.email,
+                            items.mobile,
+                            items.designation,
+                            items.emptype,
+                            items.joindate,
+                            items.experience,
+                            items.salary,
+                            items.personalnote
                           );
                         }}
                       >
@@ -127,6 +225,213 @@ function Tablesection(props) {
           </tbody>
         </table>
       </div>
+      {/* Edit modal */}
+      <Modal
+        show={show}
+        onHide={handleClose}
+        backdrop="static"
+        keyboard={false}
+        size="lg"
+      >
+        <Form onSubmit={updateData}>
+          <Modal.Header closeButton>
+            <Modal.Title>Add People</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className="text-blue-900"> Full Name*</Form.Label>
+              <Form.Control
+                type="text"
+                name="fnameState"
+                value={fnameState}
+                onChange={(e) => {
+                  setFNameState(e.target.value);
+                }}
+                required
+              />
+            </Form.Group>
+            <div className="row">
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">
+                  Name with initials*
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="iName"
+                  value={iName}
+                  onChange={(e) => {
+                    setIName(e.target.value);
+                  }}
+                  required
+                />
+              </Form.Group>
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">
+                  Preferred / Display Name
+                </Form.Label>
+                <Form.Control
+                  type="text"
+                  name="disName"
+                  value={disName}
+                  onChange={(e) => {
+                    setDisName(e.target.value);
+                  }}
+                />
+              </Form.Group>
+            </div>
+            <div className="row">
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900"> Gender</Form.Label>
+                <Form.Select
+                  size="sm"
+                  name="gender"
+                  value={gender}
+                  onChange={(e) => {
+                    setGender(e.target.value);
+                  }}
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Date of Birth</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="dob"
+                  value={dob}
+                  onChange={(e) => {
+                    setDob(e.target.value);
+                  }}
+                />
+              </Form.Group>
+            </div>
+            <div className="row">
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Mobile Number</Form.Label>
+                <Form.Control
+                  type="number"
+                  name="mobile"
+                  value={mobile}
+                  onChange={(e) => {
+                    setMobile(e.target.value);
+                  }}
+                />
+              </Form.Group>
+            </div>
+            <div className="row">
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Designation</Form.Label>
+                <Form.Control
+                  type="text"
+                  name="designation"
+                  value={designation}
+                  onChange={(e) => {
+                    setDesignation(e.target.value);
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Employee Type</Form.Label>
+                <Form.Select
+                  size="sm"
+                  name="empType"
+                  value={empType}
+                  onChange={(e) => {
+                    setEmpType(e.target.value);
+                  }}
+                >
+                  <option value="Full Time">Full Time</option>
+                  <option value="Part Time">Part Time</option>
+                  <option value="Contract Basis">Contract Basis</option>
+                  <option value="Other">Other</option>
+                </Form.Select>
+              </Form.Group>
+            </div>
+            <div className="row">
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Joined Date</Form.Label>
+                <Form.Control
+                  type="date"
+                  name="joinDate"
+                  value={joindate}
+                  onChange={(e) => {
+                    setJoinDate(e.target.value);
+                  }}
+                />
+              </Form.Group>
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Experience</Form.Label>
+                <Form.Select
+                  size="sm"
+                  name="experience"
+                  value={experience}
+                  onChange={(e) => {
+                    setExperience(e.target.value);
+                  }}
+                >
+                  <option value="01 Year">01 Years</option>
+                  <option value="02 Year">02 Years</option>
+                  <option value="03 Year">03 Years</option>
+                  <option value="04 Year">04 Years</option>
+                  <option value="05 Year">05 Years</option>
+                  <option value="06 Year">06 Years</option>
+                  <option value="07 Year">07 Years</option>
+                  <option value="08 Year">08 Years</option>
+                  <option value="09 Year">09 Years</option>
+                </Form.Select>
+              </Form.Group>
+            </div>
+            <div className="row">
+              <Form.Group className="mb-3 col-6" controlId="formBasicEmail">
+                <Form.Label className="text-blue-900">Salary</Form.Label>
+                <Form.Control
+                  className="text-end"
+                  type="number"
+                  name="salary"
+                  value={salary}
+                  onChange={(e) => {
+                    setSalary(e.target.value);
+                  }}
+                />
+              </Form.Group>
+            </div>
+            <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Label className="text-blue-900"> Personal Notes</Form.Label>
+              <Form.Control
+                className="h-20"
+                as="textarea"
+                name="pNote"
+                value={pNote}
+                onChange={(e) => {
+                  setPNote(e.target.value);
+                }}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="outline-light text-primary" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button variant="primary" type="submit">
+              Edit People
+            </Button>
+          </Modal.Footer>
+        </Form>
+      </Modal>
+      {/* End edit modal */}
     </div>
   );
 }

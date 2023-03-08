@@ -3,6 +3,7 @@ import { Modal, Form, Button } from "react-bootstrap";
 import axios from "axios";
 
 function Buttonsection() {
+  //states
   const [data, setData] = useState({
     fullName: "",
     iniName: "",
@@ -20,9 +21,10 @@ function Buttonsection() {
   });
 
   const [show, setShow] = useState(false);
+  const [filterdData, setFilterdData] = useState([]);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-
+  //store data
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
@@ -36,7 +38,6 @@ function Buttonsection() {
         }
       )
       .then((res) => {
-        console.log(res);
         window.location.reload();
         handleClose();
       })
@@ -46,10 +47,21 @@ function Buttonsection() {
       });
   };
 
+  //form onchange
   const handleChange = (e) => {
     const newData = { ...data };
     newData[e.target.name] = e.target.value;
     setData(newData);
+  };
+  //filter data
+  const filterData = (type) => {
+    axios
+      .get(`http://localhost:5000/api/emp/filterEmp/'${type}'`)
+      .then((res) => {
+        const data = res.data.data;
+        setFilterdData(data);
+      });
+    return { filterdData };
   };
   return (
     <div className="mx-14">
@@ -59,12 +71,14 @@ function Buttonsection() {
           <select
             id="countries"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-md  w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-800"
+            onChange={(e) => {
+              filterData(e.target.value);
+            }}
           >
-            <option selected>Choose a country</option>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-            <option value="FR">France</option>
-            <option value="DE">Germany</option>
+            <option value="Full Time">Full Time</option>
+            <option value="Part Time">Part Time</option>
+            <option value="Contract Basis">Contract Basis</option>
+            <option value="Other">Other</option>
           </select>
         </div>
         {/* End emp filter */}
