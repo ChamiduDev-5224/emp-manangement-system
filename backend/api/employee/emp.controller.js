@@ -1,4 +1,4 @@
-const { addEmployee, getEmployee } = require("./emp.service");
+const { addEmployee, getEmployee, deleteEmployee } = require("./emp.service");
 module.exports = {
   addEmployee: (req, res) => {
     const body = req.body;
@@ -26,6 +26,22 @@ module.exports = {
       return res.json({
         success: 1,
         data: results,
+      });
+    });
+  },
+  deleteEmployee: (req, res) => {
+    deleteEmployee(req.params, (err, results) => {
+      if (err) {
+        console.log(err);
+        res.json({
+          success: 0,
+          message: " not deleted",
+        });
+        return;
+      }
+      return res.json({
+        success: 1,
+        message: "succesfully deleted",
       });
     });
   },

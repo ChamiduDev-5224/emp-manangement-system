@@ -36,4 +36,19 @@ module.exports = {
       return callBack(null, results);
     });
   },
+  deleteEmployee: (data, callBack) => {
+    pool.query(
+      `delete from employee where id=?`,
+      [data.id],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        console.log(results.affectedRows < 1);
+        if (results.affectedRows < 1) return callBack(true);
+
+        return callBack(null, results);
+      }
+    );
+  },
 };

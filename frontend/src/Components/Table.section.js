@@ -4,13 +4,24 @@ import React, { useEffect, useState } from "react";
 function Tablesection(props) {
   const [data, setData] = useState([]);
   useEffect(() => {
+    fetchData();
+  }, []);
+  const fetchData = () => {
     axios.get("http://localhost:5000/api/emp/getAlldata").then((res) => {
       const data = res.data.data;
       setData(data);
       console.log(data);
     });
-  }, []);
-
+  };
+  const editData = () => {};
+  const deleteData = (id) => {
+    console.log("hello");
+    axios
+      .delete("http://localhost:5000/api/emp/deleteEmp/" + id)
+      .then((response) => {
+        fetchData();
+      });
+  };
   return (
     <div className="mx-14">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
@@ -64,9 +75,12 @@ function Tablesection(props) {
             </tr>
           </thead>
           <tbody>
-            {data?.map((items) => {
+            {data?.map((items, index) => {
               return (
-                <tr className="bg-white border-b dark:border-gray-700">
+                <tr
+                  key={index}
+                  className="bg-white border-b dark:border-gray-700"
+                >
                   <th
                     scope="row"
                     className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
@@ -84,10 +98,25 @@ function Tablesection(props) {
                   <td className="px-6 py-4">{items.experience}</td>
                   <td className="px-6 py-4 ">
                     <div className="flex flex-row gap-3">
-                      <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                      <button
+                        className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                        onClick={() => {
+                          editData(
+                            items.catId,
+                            items.catName,
+                            items.create_at,
+                            items.updated_at
+                          );
+                        }}
+                      >
                         Edit
                       </button>
-                      <button className="font-medium text-red-600 dark:text-red-500 hover:underline">
+                      <button
+                        className="font-medium text-red-600 dark:text-red-500 hover:underline"
+                        onClick={() => {
+                          deleteData(items.id);
+                        }}
+                      >
                         Delete
                       </button>
                     </div>
