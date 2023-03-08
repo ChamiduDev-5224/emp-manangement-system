@@ -1,6 +1,16 @@
-import React from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 function Tablesection(props) {
+  const [data, setData] = useState([]);
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/emp/getAlldata").then((res) => {
+      const data = res.data.data;
+      setData(data);
+      console.log(data);
+    });
+  }, []);
+
   return (
     <div className="mx-14">
       <div className="relative overflow-x-auto shadow-md sm:rounded-lg ">
@@ -54,34 +64,37 @@ function Tablesection(props) {
             </tr>
           </thead>
           <tbody>
-            <tr className="bg-white border-b dark:border-gray-700">
-              <th
-                scope="row"
-                className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
-              >
-                Apple MacBook Pro 17"
-              </th>
-              <td className="px-6 py-4 text-gray-900">Silver</td>
-              <td className="px-6 py-4">Laptop</td>
-              <td className="px-6 py-4">$2999</td>
-              <td className="px-6 py-4">Laptop</td>
-              <td className="px-6 py-4 ">
-                <div className="flex flex-row gap-3">
-                  <a
-                    href="#"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+            {data?.map((items) => {
+              return (
+                <tr className="bg-white border-b dark:border-gray-700">
+                  <th
+                    scope="row"
+                    className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap"
                   >
-                    Edit
-                  </a>
-                  <a
-                    href="#"
-                    className="font-medium text-red-600 dark:text-red-500 hover:underline"
-                  >
-                    Delete
-                  </a>
-                </div>
-              </td>
-            </tr>
+                    {items.displayname}
+                  </th>
+                  <td className="px-6 py-4 text-gray-900">
+                    {items.id.toLocaleString(undefined, {
+                      useGrouping: false,
+                      minimumIntegerDigits: 4,
+                    })}
+                  </td>
+                  <td className="px-6 py-4">{items.designation}</td>
+                  <td className="px-6 py-4">{items.emptype}</td>
+                  <td className="px-6 py-4">{items.experience}</td>
+                  <td className="px-6 py-4 ">
+                    <div className="flex flex-row gap-3">
+                      <button className="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                        Edit
+                      </button>
+                      <button className="font-medium text-red-600 dark:text-red-500 hover:underline">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
